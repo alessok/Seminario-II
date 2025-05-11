@@ -1,0 +1,9 @@
+streamlit
+pandas
+plotly
+numpy
+# Otras que hayas usado explícitamente, aunque las de arriba son las principales para el dashboard
+# Por ejemplo, si usaste scikit-learn para el clustering y quieres asegurar que esté disponible:
+# scikit-learn
+# Si usaste pmdarima en alguna parte del flujo que Streamlit pudiera intentar ejecutar (improbable en app.py):
+# pmdarima
