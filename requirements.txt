@@ -2,6 +2,7 @@ streamlit
 pandas
 plotly
 numpy
+scikit-learn
 # Otras que hayas usado explícitamente, aunque las de arriba son las principales para el dashboard
 # Por ejemplo, si usaste scikit-learn para el clustering y quieres asegurar que esté disponible:
 # scikit-learn
