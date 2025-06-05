@@ -1,165 +1,203 @@
-import numpy as np
 import streamlit as st
-import pandas as pd # Importa pandas para manejar DataFrames
-import plotly.express as px # Importa Plotly Express para crear gráficos de línea interactivos
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import numpy as np
+from sklearn.decomposition import PCA # Para el gráfico PCA
 
-# --- Configuración de la Página del Dashboard ---
-st.set_page_config(layout='wide')
-st.title('Dashboard de Pronóstico de Ingresos por Clúster de PYMEs')
-# Texto Explicativo: Introducción (NUEVO)
-st.write('Este dashboard presenta los resultados de la segmentación de PYMEs y el pronóstico de sus ingresos mensuales. Los pronósticos se basan en modelos de series temporales ajustados a datos históricos por cada segmento de clientes.')
+# --- 1. Configuración de la Página ---
+st.set_page_config(page_title="Dashboard PYMEs", layout="wide", initial_sidebar_state="expanded")
+st.title("📊 Comprensión Dinámica del Cliente en PYMEs")
+st.markdown("Análisis de Segmentación (K-Medoids) y Pronósticos de Ingresos (Prophet)")
 
-
-# --- Cargar los Datos de Series de Tiempo ---
-ts_data_filename = 'combined_time_series_data.csv'
-
+# --- 2. Carga de Datos ---
 @st.cache_data
-def load_ts_data(filename):
-    """Carga los datos de series de tiempo desde un archivo CSV."""
-    data = pd.read_csv(filename)
-    data['Fecha'] = pd.to_datetime(data['Fecha'])
-    return data
-
-combined_ts_data = load_ts_data(ts_data_filename)
-
-
-# --- Cargar los Datos de Características de Clúster (Bloque Punto 1) ---
-chars_filename = 'cluster_characteristics.csv'
-
-@st.cache_data
-def load_characteristics_data(filename):
-    """Carga los datos de características de clúster desde un archivo CSV."""
+def load_data():
     try:
-        chars_data = pd.read_csv(filename, index_col=0) # Asumimos índice es el clúster
-        return chars_data
-    except FileNotFoundError:
-        st.error(f"Error: Archivo de características de clúster no encontrado en '{filename}'. Asegúrate de que el archivo existe y está en la misma carpeta ('Seminario2') que app.py.")
-        return None
+        df_clusters_info = pd.read_csv('pymes_con_clusters.csv') 
+        df_historico = pd.read_csv('ts_mensual_historico.csv', index_col='fecha', parse_dates=True)
+        df_historico.columns = [str(int(float(col))) for col in df_historico.columns]
 
-cluster_characteristics_summary = load_characteristics_data(chars_filename)
+        pronosticos = {}
+        for i in range(3):
+            try:
+                pronosticos[str(i)] = pd.read_csv(f'pronostico_prophet_cluster_{i}.csv', index_col='ds', parse_dates=True)
+            except FileNotFoundError:
+                 pronosticos[str(i)] = None
 
+        df_summary = pd.read_csv('kmedoids_summary.csv', index_col='cluster_kmedoids')
+        df_summary.index = df_summary.index.astype(str)
+        
+        df_mapeo = pd.read_csv('mapeo_pymes.csv')
+        
+        df_X_procesado = pd.read_csv('X_procesado_para_pca.csv')
 
-# --- Definir Métricas de Evaluación (Bloque Punto 3) ---
-sarima_metrics = {
-    0: {'RMSE': 31103.02, 'MAE': 28321.19}, # Métricas para Clúster 0
-    1: {'RMSE': 15242.39, 'MAE': 13051.92}, # Métricas para Clúster 1
-    2: {'RMSE': 21687.07, 'MAE': 19497.38}  # Métricas para Clúster 2
+        return df_clusters_info, df_historico, pronosticos, df_summary, df_mapeo, df_X_procesado
+    except Exception as e:
+        st.error(f"Error al cargar los datos. Error: {e}")
+        return None, None, None, None, None, None
+
+df_clusters_info, df_historico, pronosticos, df_summary, df_mapeo, df_X_procesado = load_data()
+
+# --- Nombres, Descripciones COMPLETAS y Recomendaciones COMPLETAS ---
+cluster_names = {"0": "Líderes Consolidados", "1": "Transaccionales Activos", "2": "Emergentes Moderados"}
+cluster_colors = {"0": "blue", "1": "green", "2": "orange"}
+
+cluster_descriptions = {
+    "0": "Este clúster se destaca por sus altos ingresos totales (34,560.04) y el ticket promedio más alto (aproximadamente 1,515.64), lo que indica compras de gran valor con una frecuencia moderada de transacciones (22.89). Su largo periodo de actividad (766.08 días) y cantidad total significativa (4,048.82) reflejan una base de clientes estable y consolidada.",
+    "1": "Este clúster lidera con los mayores ingresos totales (36,785.56), el mayor número de transacciones (33.51) y la mayor diversidad de productos únicos (16.63), además de un ticket promedio elevado (1,081.5). Su periodo de actividad más largo (801.9 días) sugiere una base de clientes leales y altamente activos.",
+    "2": "Este clúster tiene los menores ingresos totales (16,082.32), número de transacciones (19.51) y productos únicos (12.23), junto con el ticket promedio más bajo (839.38) y el periodo de actividad más corto (725.88 días). Representa a clientes nuevos o de menor escala con una actividad menos intensa."
 }
 
+cluster_recommendations = {
+    "0": """
+    **Recomendación Principal:** Diversificar la base de clientes y modernizar sus operaciones.
+    **Acciones Concretas:**
+    * Explorar nuevos mercados: Identificar y contactar a clientes potenciales en segmentos no atendidos (e.g., clientes más pequeños pero recurrentes) mediante campañas de prospección en redes sociales o ferias comerciales.
+    * Invertir en digitalización: Implementar una plataforma de comercio electrónico o un sistema CRM (gestión de relaciones con clientes) para llegar a más clientes y gestionar mejor las relaciones existentes.
+    * Encuestas de satisfacción: Enviar un formulario breve a sus clientes actuales (por email o WhatsApp) para identificar por qué su desempeño podría estar decayendo y usar esos datos para ajustar productos o servicios.
+    """,
+    "1": """
+    **Recomendación Principal:** Retener clientes activos y maximizar ganancias en temporadas altas mediante estrategias personalizadas.
+    **Acciones Concretas:**
+    * Programas de lealtad: Lanzar un sistema de puntos o descuentos acumulables para clientes frecuentes, incentivando compras repetidas (e.g., "10% de descuento en tu próxima compra tras 5 transacciones").
+    * Marketing personalizado: Usar datos de ventas para enviar ofertas específicas por email o SMS antes de los picos estacionales (e.g., "Sabemos que compras X en Navidad, aquí tienes un 15% de descuento").
+    * Optimización estacional: Aumentar inventario y personal temporal durante las temporadas altas, basándose en patrones de demanda históricos, para evitar cuellos de botella.
+    """,
+    "2": """
+    **Recomendación Principal:** Enfocarse en un nicho específico y buscar apoyo externo para crecer de manera sostenible.
+    **Acciones Concretas:**
+    * Definir un nicho: Elegir un producto o servicio estrella (e.g., "somos los mejores en repostería vegana local") y concentrar recursos en promocionarlo, evitando dispersión.
+    * Marketing de bajo costo: Crear una página en Instagram o TikTok y publicar contenido diario (fotos, videos cortos) para ganar visibilidad, complementado con colaboraciones con negocios locales.
+    * Buscar mentoría: Inscribirse en un programa gratuito de apoyo a PYMEs (como los ofrecidos por cámaras de comercio o incubadoras) para recibir asesoramiento en gestión y finanzas.
+    """
+}
 
-# --- Opciones de Visualización (Sidebar) ---
-st.sidebar.header('Opciones de Visualización')
-cluster_list = ['Total', 'Clúster 0', 'Clúster 1', 'Clúster 2']
-selected_cluster = st.sidebar.selectbox('Selecciona un Clúster', cluster_list)
+# --- 3. Verificar Carga y Crear Dashboard ---
+if df_clusters_info is not None and df_historico is not None and pronosticos is not None and \
+   df_summary is not None and df_mapeo is not None and df_X_procesado is not None:
+
+    st.sidebar.header("Información del Proyecto")
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("Desarrollado como parte de la investigación:")
+    st.sidebar.markdown("*Comprensión Dinámica del Cliente en PYMEs*")
+    st.sidebar.markdown("**Autores:** Angelo Montes & Alessandro Ledesma")
+    
+    tab1, tab2, tab3 = st.tabs(["📈 Resumen General y Total", "🔍 Exploración por Clúster", "📊 Comparación y PCA"])
+
+    with tab1:
+        st.header("Ingresos Totales y Pronóstico")
+        st.markdown("Esta vista muestra la suma de los ingresos históricos y el pronóstico consolidado de los 3 clústeres.")
+        if 'Total' not in df_historico.columns: df_historico['Total'] = df_historico[["0", "1", "2"]].sum(axis=1)
+        
+        df_pronostico_total_calc = None
+        for cl_id, forecast_df in pronosticos.items():
+            if forecast_df is not None:
+                temp_df = forecast_df[['yhat']].rename(columns={'yhat': cl_id})
+                if df_pronostico_total_calc is None: df_pronostico_total_calc = temp_df
+                else: df_pronostico_total_calc = df_pronostico_total_calc.join(temp_df, how='outer')
+        
+        df_pronostico_total_futuro = None
+        if df_pronostico_total_calc is not None:
+            df_pronostico_total_calc = df_pronostico_total_calc.fillna(0)
+            if 'Total' not in df_pronostico_total_calc.columns: df_pronostico_total_calc['Total'] = df_pronostico_total_calc.sum(axis=1)
+            
+            ultima_fecha_hist = df_historico.index[-1]
+            df_pronostico_total_futuro = df_pronostico_total_calc[df_pronostico_total_calc.index > ultima_fecha_hist]
+
+        fig_total = go.Figure()
+        fig_total.add_trace(go.Scatter(x=df_historico.index, y=df_historico['Total'], mode='lines', name='Histórico Total', line=dict(color='green', width=2))) 
+        if df_pronostico_total_futuro is not None and not df_pronostico_total_futuro.empty:
+            fig_total.add_trace(go.Scatter(x=df_pronostico_total_futuro.index, y=df_pronostico_total_futuro['Total'], mode='lines', name='Pronóstico Total', line=dict(color='purple', dash='dash', width=2)))
+        fig_total.update_layout(title='Ingresos Totales (Histórico + Pronóstico)', xaxis_title='Fecha', yaxis_title='Ingresos Mensuales Totales')
+        st.plotly_chart(fig_total, use_container_width=True)
+        
+        st.subheader("Estadísticas Generales")
+        st.metric("Total PYMEs Analizadas", df_clusters_info['numerodoi'].nunique())
+        st.metric("Número de Clústeres", df_summary.shape[0])
+
+    with tab2:
+        st.header("Exploración Detallada por Clúster")
+        cluster_seleccionado = st.selectbox(
+            "Selecciona un clúster:", options=list(cluster_names.keys()),
+            format_func=lambda x: f"Clúster {x}: {cluster_names[x]}", key='select_tab2_v6_completo'
+        )
+
+        st.subheader(f"Perfil del Clúster {cluster_seleccionado}: {cluster_names[cluster_seleccionado]}")
+        
+        # Columna Izquierda para Características, Descripción y Recomendaciones
+        st.markdown("#### Características Promedio")
+        st.dataframe(df_summary.loc[cluster_seleccionado].round(2))
+        st.metric(f"PYMEs en Clúster {cluster_seleccionado}", df_clusters_info[df_clusters_info['cluster_kmedoids'] == int(cluster_seleccionado)].shape[0])
+        
+        st.markdown("#### Descripción del Clúster")
+        st.write(cluster_descriptions.get(cluster_seleccionado, "Descripción no disponible."))
+        
+        st.markdown("#### Recomendaciones Estratégicas")
+        st.info(cluster_recommendations.get(cluster_seleccionado, "Recomendaciones no disponibles."))
+
+        # Columna (o sección) para Gráfico de Pronóstico y Tabla Drill-Down debajo
+        st.markdown("---") 
+        st.markdown("#### Ingresos Históricos y Pronóstico 2026")
+        fig_cluster = go.Figure()
+        fig_cluster.add_trace(go.Scatter(x=df_historico.index, y=df_historico[cluster_seleccionado], mode='lines', name='Histórico Real', line=dict(color='green', width=2)))
+        pronostico_actual = pronosticos.get(cluster_seleccionado)
+        if pronostico_actual is not None:
+             fig_cluster.add_trace(go.Scatter(x=pronostico_actual.index, y=pronostico_actual['yhat'], mode='lines', name='Pronóstico Prophet', line=dict(color='red', dash='dash', width=2))) 
+        fig_cluster.update_layout(title=f'Ingresos - Clúster {cluster_seleccionado}', xaxis_title='Fecha', yaxis_title='Ingresos Mensuales', showlegend=True)
+        st.plotly_chart(fig_cluster, use_container_width=True)
+
+        with st.expander(f"Ver lista de PYMEs (numerodoi y Razón Social) en Clúster {cluster_seleccionado}"):
+            pymes_en_cluster = df_clusters_info[df_clusters_info['cluster_kmedoids'] == int(cluster_seleccionado)]
+            pymes_con_nombres = pd.merge(pymes_en_cluster, df_mapeo, on='numerodoi', how='left')
+            st.dataframe(pymes_con_nombres[['numerodoi', 'razonsocial', 'ingresos_totales']].round(0).set_index('numerodoi'))
 
 
-# --- Preparar Datos para la Gráfica Principal ---
-if selected_cluster == 'Total':
-    plot_data = combined_ts_data[['Fecha', 'Ingresos_Total', 'Tipo_Dato']].copy()
-    plot_data = plot_data.rename(columns={'Ingresos_Total': 'Ingresos'})
-    y_label = 'Ingresos Mensuales Totales'
+    with tab3:
+        st.header("Comparación Visual de Clústeres y Análisis PCA")
+        st.markdown("Utiliza estos gráficos para comparar características y ver la separación de clústeres.")
+        
+        col_comp1, col_comp2 = st.columns(2)
+
+        with col_comp1:
+            st.subheader("Comparación de Medias")
+            char_bar = st.selectbox("Característica (Barras):", options=df_summary.columns.tolist(), key='bar_select_tab3_v6_completo')
+            fig_bar_comp = px.bar(df_summary, x=df_summary.index, y=char_bar, 
+                                 title=f'{char_bar} Promedio', color=df_summary.index, 
+                                 color_discrete_map=cluster_colors, labels={'index': 'Clúster'})
+            st.plotly_chart(fig_bar_comp, use_container_width=True)
+        
+        with col_comp2:
+            st.subheader("Distribución de Características")
+            char_box = st.selectbox("Característica (Cajas):", options=df_summary.columns.tolist(), key='box_select_tab3_v6_completo')
+            fig_box_comp = px.box(df_clusters_info, x=df_clusters_info['cluster_kmedoids'].astype(str), y=char_box, 
+                                 title=f'Distribución de {char_box}', color=df_clusters_info['cluster_kmedoids'].astype(str), 
+                                 color_discrete_map=cluster_colors, labels={'cluster_kmedoids': 'Clúster'})
+            st.plotly_chart(fig_box_comp, use_container_width=True)
+
+        st.markdown("---")
+        st.subheader("Visualización de Clústeres con PCA (2 Componentes)")
+        if df_X_procesado is not None and df_clusters_info.shape[0] == df_X_procesado.shape[0]:
+            pca = PCA(n_components=2, random_state=42)
+            principal_components = pca.fit_transform(df_X_procesado)
+            df_pca = pd.DataFrame(data=principal_components, columns=['PCA Componente 1', 'PCA Componente 2'])
+            
+            df_pca['Clúster Etiqueta'] = df_clusters_info['cluster_kmedoids'].astype(str).values 
+            df_pca['Clúster Nombre'] = df_pca['Clúster Etiqueta'].map(lambda x: f"Clúster {x}: {cluster_names.get(x, '')}")
+
+            fig_pca = px.scatter(df_pca, x='PCA Componente 1', y='PCA Componente 2', color='Clúster Nombre',
+                                 title='Separación de PYMEs por Clúster (PCA)',
+                                 color_discrete_map={f"Clúster {k}: {v}": cluster_colors[k] for k, v in cluster_names.items()},
+                                 hover_data={'Clúster Nombre': True, 'Clúster Etiqueta': True}
+                                )
+            st.plotly_chart(fig_pca, use_container_width=True)
+            
+            explained_variance = pca.explained_variance_ratio_
+            st.caption(f"Varianza explicada por PCA1: {explained_variance[0]:.2%}")
+            st.caption(f"Varianza explicada por PCA2: {explained_variance[1]:.2%}")
+            st.caption(f"Varianza total explicada por los 2 componentes: {sum(explained_variance):.2%}")
+        else:
+            st.warning("No se puede generar el gráfico PCA: datos de X_procesado no disponibles o no coinciden en tamaño.")
+
 else:
-    cluster_num_str = selected_cluster.split(' ')[1]
-    ingresos_col = f'Ingresos_Cluster_{cluster_num_str}'
-    plot_data = combined_ts_data[['Fecha', ingresos_col, 'Tipo_Dato']].copy()
-    plot_data = plot_data.rename(columns={ingresos_col: 'Ingresos'})
-    y_label = f'Ingresos Mensuales ({selected_cluster})'
-
-# --- Crear y Mostrar la Gráfica de Series de Tiempo ---
-fig = px.line(plot_data, x='Fecha', y='Ingresos', color='Tipo_Dato',
-              title=f'Historial y Pronóstico de Ingresos - {selected_cluster}',
-              labels={'Ingresos': y_label},
-              line_dash='Tipo_Dato')
-
-fig.update_layout(hovermode='x unified')
-fig.update_xaxes(title_text='Fecha')
-fig.update_yaxes(title_text=y_label)
-
-st.plotly_chart(fig, use_container_width=True)
-
-# Texto Explicativo: Gráfico (NUEVO)
-st.markdown("""
-**Cómo leer este gráfico:**
-- La línea de color **azul (Histórico)** muestra los ingresos mensuales reales registrados hasta la fecha más reciente.
-- La línea **punteada (Pronóstico)** muestra la proyección de ingresos para los próximos 6 meses según el modelo.
-- Pasa el cursor sobre los puntos de la gráfica para ver la fecha y el valor exacto.
-""")
-
-
-# --- Organizar Métricas y Características en Columnas (Layout Mejorado) ---
-if selected_cluster != 'Total':
-    # Texto Explicativo: Perfil de Clúster (NUEVO - Condicional)
-    st.markdown(f"---") # Línea separadora
-    st.markdown(f"### Perfil del {selected_cluster}")
-    # Añadir descripción según el clúster seleccionado
-    if selected_cluster == 'Clúster 0':
-        st.write("Este clúster representa a las PYMEs de **Alto Valor y Alta Actividad**, consistentemente importantes en términos de ingresos y frecuencia.")
-    elif selected_cluster == 'Clúster 1':
-        st.write("Este clúster agrupa a las PYMEs que han estado **Activas Recientemente** y tienen una **Larga Duración** como clientes, aunque sus patrones de ingresos pueden ser más intermitentes.")
-    elif selected_cluster == 'Clúster 2':
-         st.write("Este clúster corresponde a las PYMEs de **Menor Valor y Menos Actividad**, con ingresos y transacciones generalmente bajos o intermitentes.")
-    else: # Esto no debería ocurrir con el selectbox, pero es seguro.
-        st.write("Información de perfil no disponible para este clúster.")
-
-    # Creamos 2 columnas para Métricas y Características.
-    col_metrics, col_chars = st.columns(2)
-
-    # Colocamos las Métricas en la primera columna
-    with col_metrics:
-        st.subheader(f'Métricas de Evaluación del Modelo ({selected_cluster})')
-        try:
-            cluster_num_int = int(selected_cluster.split(' ')[1])
-            if cluster_num_int in sarima_metrics:
-                metrics = sarima_metrics[cluster_num_int]
-                st.metric(label="RMSE", value=f"{metrics['RMSE']:,.2f}")
-                st.metric(label="MAE", value=f"{metrics['MAE']:,.2f}")
-            else:
-                st.write(f'No se encontraron métricas de evaluación para el {selected_cluster}.')
-        except ValueError:
-            st.write("Error interno al procesar la selección del clúster para mostrar métricas.")
-        except Exception as e:
-             st.write(f"Ocurrió un error inesperado al mostrar las métricas: {e}")
-
-    # Colocamos las Características en la segunda columna
-    with col_chars:
-        st.subheader(f'Características Clave ({selected_cluster})')
-        if cluster_characteristics_summary is not None:
-            try:
-                cluster_num_int = int(selected_cluster.split(' ')[1])
-                if cluster_num_int in cluster_characteristics_summary.index:
-                    st.dataframe(cluster_characteristics_summary.loc[[cluster_num_int]])
-                else:
-                    st.write(f'No se encontraron características detalladas para el {selected_cluster} en el archivo de características.')
-            except ValueError:
-                st.write("Error interno al procesar la selección del clúster para mostrar características.")
-            except Exception as e:
-                 st.write(f"Ocurrió un error inesperado al mostrar las características: {e}")
-        # Si cluster_characteristics_summary es None, el error de archivo ya se mostró.
-
-
-# --- Sección para Mostrar el Pronóstico Numérico en Tabla (Punto 2) ---
-st.subheader('Pronóstico Numérico (Próximos 6 Meses)')
-# Texto Explicativo: Tabla de Pronóstico (NUEVO)
-st.write("Esta tabla muestra los valores numéricos exactos del pronóstico de ingresos mensuales para los próximos 6 meses (Enero a Junio de 2026) para cada clúster y el total agregado.")
-
-
-# Filtra el DataFrame combinado para obtener solo las filas de 'Pronóstico'.
-forecast_table_data = combined_ts_data[combined_ts_data['Tipo_Dato'] == 'Pronóstico'].copy()
-
-# Selecciona las columnas para la tabla.
-columns_for_forecast_table = [
-    'Fecha',
-    'Ingresos_Cluster_0',
-    'Ingresos_Cluster_1',
-    'Ingresos_Cluster_2',
-    'Ingresos_Total'
-]
-forecast_table_data = forecast_table_data[columns_for_forecast_table]
-
-# Formatear los números para la tabla.
-for col in ['Ingresos_Cluster_0', 'Ingresos_Cluster_1', 'Ingresos_Cluster_2', 'Ingresos_Total']:
-     if col in forecast_table_data.columns:
-          forecast_table_data[col] = forecast_table_data[col].apply(lambda x: f'{x:,.2f}' if pd.notna(x) else '')
-
-# Muestra la tabla.
-st.dataframe(forecast_table_data)
+    st.error("No se pudieron cargar todos los datos necesarios. Por favor, verifica que los archivos CSV estén en la misma carpeta y se hayan generado correctamente.")
