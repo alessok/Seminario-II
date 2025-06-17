@@ -1,0 +1,73 @@
+# Archivos de datos sensibles - NO SUBIR A REPOSITORIO PÚBLICO
+mapeo_pymes.csv
+pymes_con_clusters.csv
+combined_time_series_data.csv
+ts_mensual_historico.csv
+X_procesado_para_pca.csv
+cluster_characteristics.csv
+kmedoids_summary.csv
+pronostico_prophet_cluster_*.csv
+
+# Documentos académicos con información personal
+S2_AS2_N2_AngeloMontes_AlessandroLedesma.docx
+S2_AS2_N2_AngeloMontes_AlessandroLedesma.pdf
+
+# Archivos del entorno virtual
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+
+# Archivos de Jupyter Notebook (checkpoints)
+.ipynb_checkpoints/
+
+# Archivos de macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Archivos de configuración específicos del proyecto
+.env
+secrets.py
+
+# Archivos de logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.temp
+*~
+
+# Docker y contenedores
+.docker/
+docker-compose.override.yml
+
+# Datos de desarrollo y testing
+data/
+test_data/
+*.db
+*.sqlite3
+
+# Reportes generados
+reports/
+*.html
+*.pdf
+
+# Cache de pytest
+.pytest_cache/
+.coverage
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de backup
+*.bak
+*.backup
