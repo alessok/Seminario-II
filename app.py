@@ -40,36 +40,36 @@ def load_data():
 df_clusters_info, df_historico, pronosticos, df_summary, df_mapeo, df_X_procesado = load_data()
 
 # --- Nombres, Descripciones COMPLETAS y Recomendaciones COMPLETAS ---
-cluster_names = {"0": "Líderes Consolidados", "1": "Transaccionales Activos", "2": "Emergentes Moderados"}
+cluster_names = {"0": "Líderes Transaccionales", "1": "Premium de Alto Valor", "2": "Emergentes Moderados"}
 cluster_colors = {"0": "blue", "1": "green", "2": "orange"}
 
 cluster_descriptions = {
-    "0": "Este clúster se destaca por sus altos ingresos totales (34,560.04) y el ticket promedio más alto (aproximadamente 1,515.64), lo que indica compras de gran valor con una frecuencia moderada de transacciones (22.89). Su largo periodo de actividad (766.08 días) y cantidad total significativa (4,048.82) reflejan una base de clientes estable y consolidada.",
-    "1": "Este clúster lidera con los mayores ingresos totales (36,785.56), el mayor número de transacciones (33.51) y la mayor diversidad de productos únicos (16.63), además de un ticket promedio elevado (1,081.5). Su periodo de actividad más largo (801.9 días) sugiere una base de clientes leales y altamente activos.",
-    "2": "Este clúster tiene los menores ingresos totales (16,082.32), número de transacciones (19.51) y productos únicos (12.23), junto con el ticket promedio más bajo (839.38) y el periodo de actividad más corto (725.88 días). Representa a clientes nuevos o de menor escala con una actividad menos intensa."
+    "0": "Este clúster lidera con los mayores ingresos totales (38,119.24) y el mayor número de transacciones (33.02), además de la mayor diversidad de productos únicos (16.58). Su periodo de actividad más largo (804.16 días) sugiere una base de clientes leales y altamente activos. Representa a las PYMEs más consolidadas y exitosas.",
+    "1": "Este clúster se destaca por tener el ticket promedio más alto (1,473.63), lo que indica compras de gran valor con una frecuencia moderada de transacciones (22.23). Sus ingresos totales significativos (32,567.36) y periodo de actividad considerable (759.18 días) reflejan una base de clientes estable y con alto poder adquisitivo.",
+    "2": "Este clúster tiene los menores ingresos totales (16,171.36), número de transacciones (19.45) y productos únicos (12.07), junto con el ticket promedio más bajo (849.87) y el periodo de actividad más corto (725.95 días). Representa a PYMEs emergentes o de menor escala con una actividad menos intensa pero con potencial de crecimiento."
 }
 
 cluster_recommendations = {
     "0": """
-    **Recomendación Principal:** Diversificar la base de clientes y modernizar sus operaciones.
+    **Recomendación Principal:** Maximizar la ventaja competitiva aprovechando su liderazgo en transacciones y diversidad de productos.
     **Acciones Concretas:**
-    * Explorar nuevos mercados: Identificar y contactar a clientes potenciales en segmentos no atendidos (e.g., clientes más pequeños pero recurrentes) mediante campañas de prospección en redes sociales o ferias comerciales.
-    * Invertir en digitalización: Implementar una plataforma de comercio electrónico o un sistema CRM (gestión de relaciones con clientes) para llegar a más clientes y gestionar mejor las relaciones existentes.
-    * Encuestas de satisfacción: Enviar un formulario breve a sus clientes actuales (por email o WhatsApp) para identificar por qué su desempeño podría estar decayendo y usar esos datos para ajustar productos o servicios.
+    * Programas de fidelización avanzados: Implementar un sistema de niveles VIP con beneficios escalonados (descuentos exclusivos, acceso temprano a productos, servicios personalizados) para mantener su alta frecuencia transaccional.
+    * Cross-selling inteligente: Usar análisis de datos para identificar productos complementarios y enviar recomendaciones personalizadas a clientes basándose en su historial de compras diverso.
+    * Expansión estratégica: Considerar abrir nuevos canales de venta (marketplace digital, franquicias) aprovechando su base sólida y experiencia operacional para capturar más mercado.
     """,
     "1": """
-    **Recomendación Principal:** Retener clientes activos y maximizar ganancias en temporadas altas mediante estrategias personalizadas.
+    **Recomendación Principal:** Capitalizar el alto valor de ticket promedio y optimizar la experiencia premium del cliente.
     **Acciones Concretas:**
-    * Programas de lealtad: Lanzar un sistema de puntos o descuentos acumulables para clientes frecuentes, incentivando compras repetidas (e.g., "10% de descuento en tu próxima compra tras 5 transacciones").
-    * Marketing personalizado: Usar datos de ventas para enviar ofertas específicas por email o SMS antes de los picos estacionales (e.g., "Sabemos que compras X en Navidad, aquí tienes un 15% de descuento").
-    * Optimización estacional: Aumentar inventario y personal temporal durante las temporadas altas, basándose en patrones de demanda históricos, para evitar cuellos de botella.
+    * Servicios premium: Ofrecer experiencias exclusivas como asesoramiento personalizado, envío gratuito express, o servicio postventa diferenciado para justificar y mantener precios altos.
+    * Upselling estratégico: Entrenar al equipo de ventas para identificar oportunidades de venta de productos de mayor valor o paquetes premium durante cada interacción.
+    * Marketing de valor: Crear contenido que destaque la calidad superior y beneficios únicos de sus productos/servicios para atraer más clientes dispuestos a pagar precios premium.
     """,
     "2": """
-    **Recomendación Principal:** Enfocarse en un nicho específico y buscar apoyo externo para crecer de manera sostenible.
+    **Recomendación Principal:** Acelerar el crecimiento mediante estrategias de escalamiento y mejora de la propuesta de valor.
     **Acciones Concretas:**
-    * Definir un nicho: Elegir un producto o servicio estrella (e.g., "somos los mejores en repostería vegana local") y concentrar recursos en promocionarlo, evitando dispersión.
-    * Marketing de bajo costo: Crear una página en Instagram o TikTok y publicar contenido diario (fotos, videos cortos) para ganar visibilidad, complementado con colaboraciones con negocios locales.
-    * Buscar mentoría: Inscribirse en un programa gratuito de apoyo a PYMEs (como los ofrecidos por cámaras de comercio o incubadoras) para recibir asesoramiento en gestión y finanzas.
+    * Mejora del ticket promedio: Implementar técnicas de bundling (venta de paquetes) y promociones que incentiven compras de mayor valor, como "lleva 2 paga 1.5" o descuentos por volumen.
+    * Incremento de frecuencia: Lanzar campañas de reactivación automáticas via email/WhatsApp recordando productos vistos o comprando, con ofertas de tiempo limitado para generar urgencia.
+    * Diversificación de productos: Analizar qué productos/servicios demandan los clusters superiores e incorporar gradualmente opciones similares para ampliar el catálogo y aumentar las oportunidades de venta.
     """
 }
 
