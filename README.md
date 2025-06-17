@@ -4,8 +4,8 @@
 **Enfoque:** Análisis de datos para optimización empresarial en PYMEs
 
 ### 👥 **Desarrolladores**
-- **[Nombre ocultado por privacidad]**
-- **[Nombre ocultado por privacidad]**
+- **Alessandro Paolo Ledesma Acuña**
+- **Angelo Montes Mamani**
 
 ---
 
@@ -256,7 +256,7 @@ Abrir en el navegador: `http://localhost:8501`
 ## 📞 **Contacto**
 
 **Para consultas sobre el proyecto:**
-- **Nombres ocultos por privacidad:** [Contacto disponible bajo solicitud]
+- **Alessandro Ledesma & Angelo Montes:** 20204562@aloe.ulima.edu.pe o 20203252@aloe.ulima.edu.pe
 
 ---
 
