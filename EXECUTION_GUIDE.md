@@ -1,10 +1,11 @@
 # 🚀 Guía de Ejecución - Proyecto de Clustering PYMEs
 
 ## 📊 Estado Actual del Proyecto
-- ✅ **Dashboard ejecutándose**: `http://localhost:8504`
+- ✅ **Dashboard ejecutándose**: `http://localhost:8504` (desarrollo) | `https://localhost` (producción)
 - ✅ **Datos sanitizados**: Información personal protegida
 - ✅ **Funciones corregidas**: Error en `utils.py` resuelto
 - ✅ **Tests verificados**: Todas las funciones principales funcionan
+- ✅ **Docker desplegado**: Sistema en producción con HTTPS
 
 ## 🎯 Formas de Ejecutar el Proyecto
 
@@ -23,14 +24,52 @@ source .venv/bin/activate
 jupyter notebook SemiCode.ipynb
 ```
 
-### 3. Deployment con Docker
+### 3. Deployment con Docker (PRODUCCIÓN ACTIVA)
+**Estado**: ✅ Sistema desplegado y funcionando
+
 ```bash
 cd /Users/alessandroledesma/Seminario-II
-chmod +x deploy.sh
-./deploy.sh
+
+# Verificar estado actual
+docker ps
+
+# Deployment en producción (YA EJECUTADO)
+./deploy.sh prod
+
+# Comandos adicionales de gestión:
+./deploy.sh stop     # Detener servicios
+./deploy.sh logs     # Ver logs del sistema
+./deploy.sh restart  # Reiniciar servicios
 ```
 
-### 4. Análisis Directo con Python
+**URLs de Acceso**:
+- **HTTPS Seguro**: [https://localhost](https://localhost) (RECOMENDADO)
+- **HTTP**: [http://localhost](http://localhost) (redirige automáticamente a HTTPS)
+
+**Servicios Activos**:
+- 🐘 PostgreSQL: `localhost:5432`
+- 🔴 Redis: `localhost:6379`
+- 🌐 Nginx (SSL): `localhost:443`
+- 🐍 App Python: Interno (puerto 8501)
+
+**Si Docker no está disponible**, usa las opciones 1 o 2 (ambas funcionan perfectamente).
+
+### 4. Monitoreo del Sistema Docker
+```bash
+# Estado de contenedores
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+# Logs en tiempo real
+docker-compose -f docker-compose.prod.yml logs -f
+
+# Recursos utilizados
+docker stats
+
+# Reiniciar servicio específico
+docker-compose -f docker-compose.prod.yml restart pymes_clustering_app
+```
+
+### 5. Análisis Directo con Python
 ```python
 import pandas as pd
 import utils
@@ -60,8 +99,11 @@ insights = utils.generate_cluster_insights(df_clusters, cluster_id=0)
 
 ### 🔹 Configuración y Deployment
 - `requirements.txt` - Dependencias Python
-- `Dockerfile` & `docker-compose.yml` - Containerización
+- `Dockerfile` & `docker-compose.yml` - Containerización desarrollo
+- `docker-compose.prod.yml` - Configuración de producción
 - `deploy.sh` - Script de deployment automatizado
+- `nginx/nginx.conf` - Configuración del proxy reverso
+- `nginx/ssl/` - Certificados SSL para HTTPS
 
 ### 🔹 Seguridad
 - `.gitignore` - Archivos excluidos del repositorio
@@ -106,31 +148,55 @@ insights = utils.generate_cluster_insights(df_clusters, cluster_id=0)
 - **Ingresos promedio**: <20,000 soles
 - **Estrategia**: Optimización y reactivación
 
-## 🔧 Comandos Útiles
+### 🔧 Comandos Útiles
 
 ### Verificar Estado
 ```bash
-# Estado del entorno virtual
+# Estado del entorno virtual (desarrollo)
 source .venv/bin/activate
 python -c "import streamlit, pandas, plotly; print('✅ Todo funcionando')"
 
 # Verificar datos
 python -c "import pandas as pd; print(f'Registros: {len(pd.read_csv(\"pymes_con_clusters.csv\"))}')"
+
+# Estado del sistema Docker (producción)
+docker ps
+docker-compose -f docker-compose.prod.yml ps
 ```
 
 ### Solución de Problemas
 ```bash
-# Si el puerto está ocupado
+# Desarrollo - Si el puerto está ocupado
 lsof -ti:8504 | xargs kill -9
 
-# Reinstalar dependencias
+# Desarrollo - Reinstalar dependencias
 pip install -r requirements.txt --force-reinstall
+
+# Producción - Reiniciar sistema completo
+./deploy.sh restart
+
+# Producción - Ver logs de errores
+docker-compose -f docker-compose.prod.yml logs pymes_clustering_app
 ```
 
 ## 📱 Acceso al Dashboard
-Una vez ejecutando, el dashboard estará disponible en:
+
+### Modo Desarrollo
+Una vez ejecutando con Streamlit, el dashboard estará disponible en:
 - **Local**: [http://localhost:8504](http://localhost:8504)
 - **Red**: Ver output del comando streamlit para IP externa
+
+### Modo Producción (ACTIVO)
+El sistema Docker está desplegado y disponible en:
+- **HTTPS Seguro**: [https://localhost](https://localhost) ⭐ **RECOMENDADO**
+- **HTTP**: [http://localhost](http://localhost) (redirige a HTTPS)
+
+**Características del entorno de producción**:
+- 🔒 SSL/TLS habilitado automáticamente
+- 🚀 Nginx como proxy reverso para mejor rendimiento
+- 💾 PostgreSQL para persistencia de datos
+- ⚡ Redis para cache de alta velocidad
+- 🛡️ Contenedores con usuarios no-root para seguridad
 
 ## 🎓 Contexto Académico
 - **Proyecto**: Segmentación y Predicción de Comportamiento de Clientes en PYMEs
@@ -141,4 +207,5 @@ Una vez ejecutando, el dashboard estará disponible en:
 
 ---
 **Última actualización**: 17 de junio de 2025
-**Estado**: ✅ Completamente funcional
+**Estado**: ✅ Completamente funcional (Desarrollo + Producción Docker)
+**Producción**: ✅ Activa en https://localhost

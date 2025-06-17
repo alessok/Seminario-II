@@ -67,8 +67,9 @@ check_docker() {
         exit 1
     fi
     
-    if ! command -v docker-compose &> /dev/null; then
-        print_error "Docker Compose no está instalado. Por favor, instala Docker Compose primero."
+    # Verificar si docker compose está disponible (nueva sintaxis)
+    if ! docker compose version &> /dev/null; then
+        print_error "Docker Compose no está disponible. Por favor, instala Docker Desktop."
         exit 1
     fi
     
@@ -97,7 +98,7 @@ run_development() {
     mkdir -p data logs
     
     # Ejecutar en modo desarrollo
-    docker-compose up --build -d pymes-dashboard postgres redis
+    docker compose up --build -d pymes-dashboard postgres redis
     
     print_success "Entorno de desarrollo iniciado"
     print_status "Dashboard disponible en: http://localhost:8501"
@@ -105,7 +106,7 @@ run_development() {
     
     # Mostrar logs en tiempo real
     print_status "Mostrando logs... (Ctrl+C para salir)"
-    docker-compose logs -f pymes-dashboard
+    docker compose logs -f pymes-dashboard
 }
 
 # Función para producción
@@ -160,7 +161,7 @@ EOL
     fi
     
     # Ejecutar en modo producción
-    docker-compose --profile production up --build -d
+    docker compose --profile production up --build -d
     
     print_success "Entorno de producción iniciado"
     print_status "Dashboard disponible en: https://localhost"
@@ -170,7 +171,7 @@ EOL
 # Función para construir imagen
 build_image() {
     print_status "Construyendo imagen Docker..."
-    docker-compose build pymes-dashboard
+    docker compose build pymes-dashboard
     print_success "Imagen construida exitosamente"
 }
 
@@ -191,7 +192,7 @@ run_tests() {
 clean_environment() {
     print_status "Limpiando entorno..."
     
-    docker-compose down -v --remove-orphans
+    docker compose down -v --remove-orphans
     docker system prune -f
     
     print_success "Entorno limpiado"
@@ -201,20 +202,20 @@ clean_environment() {
 show_logs() {
     local service=${2:-"pymes-dashboard"}
     print_status "Mostrando logs de $service..."
-    docker-compose logs -f "$service"
+    docker compose logs -f "$service"
 }
 
 # Función para detener servicios
 stop_services() {
     print_status "Deteniendo servicios..."
-    docker-compose down
+    docker compose down
     print_success "Servicios detenidos"
 }
 
 # Función para reiniciar servicios
 restart_services() {
     print_status "Reiniciando servicios..."
-    docker-compose restart
+    docker compose restart
     print_success "Servicios reiniciados"
 }
 
@@ -224,7 +225,7 @@ check_health() {
     
     # Verificar estado de contenedores
     echo -e "\n📊 Estado de contenedores:"
-    docker-compose ps
+    docker compose ps
     
     # Verificar conectividad
     echo -e "\n🔗 Verificando conectividad:"
@@ -236,7 +237,7 @@ check_health() {
     fi
     
     # Verificar base de datos
-    if docker-compose exec postgres pg_isready -U pymes_user &>/dev/null; then
+    if docker compose exec postgres pg_isready -U pymes_user &>/dev/null; then
         print_success "Base de datos responde correctamente"
     else
         print_warning "Base de datos no responde o no está configurada"
