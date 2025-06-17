@@ -1,10 +1,46 @@
-streamlit
-pandas
-plotly
-numpy
-scikit-learn
-# Otras que hayas usado explícitamente, aunque las de arriba son las principales para el dashboard
-# Por ejemplo, si usaste scikit-learn para el clustering y quieres asegurar que esté disponible:
-# scikit-learn
-# Si usaste pmdarima en alguna parte del flujo que Streamlit pudiera intentar ejecutar (improbable en app.py):
-# pmdarima
+# ================================================
+# DEPENDENCIAS PRINCIPALES PARA EL PROYECTO
+# Comprensión Dinámica del Cliente en PYMEs
+# ================================================
+
+# Dashboard y Visualización
+streamlit>=1.28.0
+plotly>=5.15.0
+
+# Manipulación y Análisis de Datos
+pandas>=2.0.0
+numpy>=1.24.0
+openpyxl>=3.1.0
+
+# Machine Learning y Clustering
+scikit-learn>=1.3.0
+scikit-learn-extra>=0.3.0
+
+# Series Temporales y Pronósticos
+prophet>=1.1.4
+pmdarima>=2.0.3
+
+# Visualización Adicional
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Clustering Avanzado (K-Medoids)
+pyclustering>=0.10.1
+
+# Utilidades de Sistema
+setuptools>=68.0.0
+
+# ================================================
+# NOTAS DE INSTALACIÓN:
+# ================================================
+# 1. Para instalar todas las dependencias:
+#    pip install -r requirements.txt
+#
+# 2. Si hay problemas con prophet en macOS:
+#    conda install -c conda-forge prophet
+#
+# 3. Para pyclustering en sistemas modernos:
+#    pip install pyclustering
+#
+# 4. Versiones de Python compatibles: 3.8+
+# ================================================
