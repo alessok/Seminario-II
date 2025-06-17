@@ -6,9 +6,14 @@ import numpy as np
 from sklearn.decomposition import PCA # Para el gráfico PCA
 
 # --- 1. Configuración de la Página ---
-st.set_page_config(page_title="Dashboard PYMEs", layout="wide", initial_sidebar_state="expanded")
-st.title("📊 Comprensión Dinámica del Cliente en PYMEs")
-st.markdown("Análisis de Segmentación (K-Medoids) y Pronósticos de Ingresos (Prophet)")
+st.set_page_config(page_title="Dashboard PYMEs - Análisis Clustering", layout="wide", initial_sidebar_state="expanded")
+st.title("🎓 Segmentación y Predicción de Comportamiento de Clientes en PYMEs")
+st.markdown("**Proyecto de Investigación en Análisis de Datos Empresariales**")
+st.markdown("*Sistema integrado de Clustering y Series Temporales para optimización de PYMEs*")
+st.markdown("**Desarrolladores:** [Nombres ocultos por privacidad]")
+st.markdown("---")
+st.markdown("### 📊 Dashboard Interactivo: Clustering K-Medoids + Pronósticos Prophet")
+st.markdown("**Metodología:** 8 fases | **Dataset:** 3,944 registros de 155 empresas | **Análisis:** 2023-2025")
 
 # --- 2. Carga de Datos ---
 @st.cache_data
@@ -51,25 +56,82 @@ cluster_descriptions = {
 
 cluster_recommendations = {
     "0": """
-    **Recomendación Principal:** Maximizar la ventaja competitiva aprovechando su liderazgo en transacciones y diversidad de productos.
-    **Acciones Concretas:**
-    * Programas de fidelización avanzados: Implementar un sistema de niveles VIP con beneficios escalonados (descuentos exclusivos, acceso temprano a productos, servicios personalizados) para mantener su alta frecuencia transaccional.
-    * Cross-selling inteligente: Usar análisis de datos para identificar productos complementarios y enviar recomendaciones personalizadas a clientes basándose en su historial de compras diverso.
-    * Expansión estratégica: Considerar abrir nuevos canales de venta (marketplace digital, franquicias) aprovechando su base sólida y experiencia operacional para capturar más mercado.
+    **Recomendación Principal (Basada en Marco Teórico):** Maximizar ventaja competitiva mediante modelo RFM extendido y clustering dinámico.
+    
+    **Fundamento Académico:** Según S. Wang et al. (2024), el modelo LRFMS supera al RFM tradicional en 18-21% para clusters de alta transaccionalidad.
+    
+    **Acciones Estratégicas Específicas:**
+    
+    🎯 **Programas de Fidelización Multinivel (Evidencia: Ebadi Jalal & Elmaghraby, 2024)**
+    • Implementar sistema VIP con 3 niveles basado en frecuencia transaccional (33+ transacciones)
+    • Beneficios escalonados: descuentos 5%-10%-15%, acceso temprano, servicios personalizados
+    • ROI esperado: 15% aumento en ventas según modelo RFM mejorado (Kasem et al., 2024)
+    
+    🔄 **Cross-selling Predictivo (Base: Prophet + Clustering)**
+    • Usar pronósticos Prophet para identificar ventanas óptimas de recomendación
+    • Análisis de canasta de mercado en 16.58 productos únicos promedio
+    • Automatización via email/WhatsApp en picos estacionales predichos
+    
+    📈 **Expansión Estratégica Basada en Datos**
+    • Replicar modelo exitoso (804 días actividad promedio) en nuevos canales
+    • Marketplace digital con algoritmos de recomendación similares
+    • Franquicias usando metodología de clustering validada (Silhouette: 0.2337)
     """,
     "1": """
-    **Recomendación Principal:** Capitalizar el alto valor de ticket promedio y optimizar la experiencia premium del cliente.
-    **Acciones Concretas:**
-    * Servicios premium: Ofrecer experiencias exclusivas como asesoramiento personalizado, envío gratuito express, o servicio postventa diferenciado para justificar y mantener precios altos.
-    * Upselling estratégico: Entrenar al equipo de ventas para identificar oportunidades de venta de productos de mayor valor o paquetes premium durante cada interacción.
-    * Marketing de valor: Crear contenido que destaque la calidad superior y beneficios únicos de sus productos/servicios para atraer más clientes dispuestos a pagar precios premium.
+    **Recomendación Principal (Basada en Marco Teórico):** Optimizar experiencia premium mediante marketing de valor diferenciado.
+    
+    **Fundamento Académico:** Anitha & Neelakandan (2024) demuestran que la personalización premium aumenta retención en 20% y reduce inventario en sectores de alto valor.
+    
+    **Acciones Estratégicas Específicas:**
+    
+    💎 **Servicios Premium Científicamente Validados**
+    • Justificación de ticket promedio ($1,473.63) mediante valor agregado cuantificable
+    • Asesoramiento personalizado basado en análisis predictivo Prophet
+    • Servicio postventa diferenciado para mantener período actividad (759 días promedio)
+    • SLA premium: respuesta <2hrs, envío express, garantía extendida
+    
+    📊 **Upselling Estratégico con Inteligencia Temporal**
+    • Identificar ventanas óptimas usando pronósticos MAPE 1.72% (mejor precisión)
+    • Entrenar equipo con datos de 22.23 transacciones promedio por cliente
+    • Productos complementarios de alto margen durante picos predichos
+    • Seguimiento KPI: incremento ticket promedio 10-15%
+    
+    🎯 **Marketing de Valor Basado en Evidencia**
+    • Contenido que destaque ROI cuantificable del ticket premium
+    • Casos de éxito basados en datos reales del cluster
+    • Testimonios de clientes con mayor período de actividad
+    • Campañas dirigidas a prospectos similares (ingresos $30K-35K)
     """,
     "2": """
-    **Recomendación Principal:** Acelerar el crecimiento mediante estrategias de escalamiento y mejora de la propuesta de valor.
-    **Acciones Concretas:**
-    * Mejora del ticket promedio: Implementar técnicas de bundling (venta de paquetes) y promociones que incentiven compras de mayor valor, como "lleva 2 paga 1.5" o descuentos por volumen.
-    * Incremento de frecuencia: Lanzar campañas de reactivación automáticas via email/WhatsApp recordando productos vistos o comprando, con ofertas de tiempo limitado para generar urgencia.
-    * Diversificación de productos: Analizar qué productos/servicios demandan los clusters superiores e incorporar gradualmente opciones similares para ampliar el catálogo y aumentar las oportunidades de venta.
+    **Recomendación Principal (Basada en Marco Teórico):** Acelerar crecimiento mediante estrategias de escalamiento validadas científicamente.
+    
+    **Fundamento Académico:** Bañales et al. (2025) demuestran que PYMEs emergentes pueden reducir distancia intra-cluster en 52% mediante clustering multifase.
+    
+    **Acciones Estratégicas Específicas:**
+    
+    📈 **Optimización de Ticket Promedio (Target: $849.87 → $1,200)**
+    • Bundling inteligente basado en análisis de productos únicos (12.07 promedio)
+    • Promociones "compra X, lleva Y" validadas estadísticamente
+    • Descuentos por volumen escalados según capacidad financiera del cluster
+    • Métricas: MAPE 52.86% indica alta variabilidad = oportunidad de mejora
+    
+    🔄 **Incremento de Frecuencia Transaccional (Target: 19.45 → 25)**
+    • Campañas de reactivación cada 30 días (período actividad: 725 días)
+    • WhatsApp automatizado con ofertas time-sensitive
+    • Recordatorios predictivos basados en patrones Prophet identificados
+    • Email marketing segmentado por comportamiento de compra histórico
+    
+    🚀 **Diversificación Estratégica Progresiva**
+    • Incorporar gradualmente productos exitosos de clusters superiores
+    • Análisis ABC de productos para maximizar rotación limitada
+    • Alianzas estratégicas para ampliar catálogo sin inversión inicial
+    • Plan escalonado: +2 productos únicos cada trimestre
+    
+    💡 **Mentoría Académica y Técnica**
+    • Implementar metodología de 8 fases validada en esta investigación
+    • Capacitación en análisis básico con herramientas gratuitas (Google Analytics)
+    • Seguimiento mensual con métricas simplificadas del dashboard
+    • Red de apoyo entre PYMEs del mismo cluster para mejores prácticas
     """
 }
 
@@ -77,11 +139,27 @@ cluster_recommendations = {
 if df_clusters_info is not None and df_historico is not None and pronosticos is not None and \
    df_summary is not None and df_mapeo is not None and df_X_procesado is not None:
 
-    st.sidebar.header("Información del Proyecto")
+    st.sidebar.header("🎓 Información de la Investigación")
     st.sidebar.markdown("---")
-    st.sidebar.markdown("Desarrollado como parte de la investigación:")
-    st.sidebar.markdown("*Comprensión Dinámica del Cliente en PYMEs*")
-    st.sidebar.markdown("**Autores:** Angelo Montes & Alessandro Ledesma")
+    st.sidebar.markdown("**Universidad de Lima**")
+    st.sidebar.markdown("Facultad de Ingeniería")
+    st.sidebar.markdown("Carrera de Ingeniería de Sistemas")
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("**Trabajo de Investigación:**")
+    st.sidebar.markdown("*Segmentación y Predicción de Comportamiento de Clientes en PYMEs mediante Clustering y Series Temporales*")
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("**Autores:**")
+    st.sidebar.markdown("• [Nombre oculto por privacidad] (código oculto)")
+    st.sidebar.markdown("• [Nombre oculto por privacidad] (código oculto)")
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("**Asesora:** Lourdes Ramírez Cerna")
+    st.sidebar.markdown("**Fecha:** Mayo 2025")
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("**Metodología:** 8 Fases")
+    st.sidebar.markdown("**Dataset:** 3,944 registros")
+    st.sidebar.markdown("**Período:** Enero 2023 - Mayo 2025")
+    st.sidebar.markdown("**Algoritmo:** K-Medoids (k=3)")
+    st.sidebar.markdown("**Pronósticos:** Prophet hasta 2026")
     
     tab1, tab2, tab3 = st.tabs(["📈 Resumen General y Total", "🔍 Exploración por Clúster", "📊 Comparación y PCA"])
 
