@@ -18,7 +18,6 @@ scikit-learn-extra>=0.3.0
 
 # Series Temporales y Pronósticos
 prophet>=1.1.4
-pmdarima>=2.0.3
 
 # Visualización Adicional
 matplotlib>=3.7.0
